@@ -1,6 +1,11 @@
 @startuml HSAPI-UML
 
 !include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
+
+skinparam {
+        DefaultFontName Avenir Medium
+}
+
 set separator ::
 
 ''' Core
@@ -22,6 +27,7 @@ struct Core::Scene {
 struct Core::Object {
         public String name
         public ObjectType object_type
+        public String text_content
         public Vec<Rule> rules
         public addRule(rule) -> (Void, Err)
 }
@@ -45,10 +51,6 @@ enum Core::ObjectType {
         ...etc for whatever IDs
 }
 
-enum Core::TextObject {
-        public String content
-}
-
 enum Core::RuleType {
         WHEN_PROJECT_STARTS = 0
         ...etc for whatever IDs
@@ -59,9 +61,12 @@ enum Core::BlockType {
         ...etc for whatever IDs
 }
 
+
 ''' Requests
 
-struct Requests::OnlineProjectMetadata {
+struct Requests::OnlineProject {
+        String url
+        String name
         uint32 likes
         uint32 mushrooms
         String thumbnail_url
@@ -74,11 +79,8 @@ Object <-d- Rule
 Rule <-d- Block
 
 ' Relationships
-Project - OnlineProjectMetadata
 Rule -l- RuleType
 Block -l- BlockType
 Object -l- ObjectType
-
-TextObject -r-|> ObjectType
 
 @enduml
