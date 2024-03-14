@@ -1,0 +1,84 @@
+@startuml HSAPI-UML
+
+!include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
+set separator ::
+
+''' Core
+
+' Structs
+
+struct Core::Project {
+        public String name
+        public SystemTime last_opened
+        public Some<OnlineProjectMetadata> online_metadata
+        public Vec<Scene> scenes
+}
+
+struct Core::Scene {
+        public String name
+        public Vec<Object> objects
+}
+
+struct Core::Object {
+        public String name
+        public ObjectType object_type
+        public Vec<Rule> rules
+        public addRule(rule) -> (Void, Err)
+}
+
+struct Core::Rule {
+        public RuleType rule_type
+        public Vec<Block> blocks
+}
+
+struct Core::Block {
+        public BlockType block_type
+        public Vec<String> values
+}
+
+
+' Enums
+
+enum Core::ObjectType {
+        TEXT = 0
+        BEAR = 1
+        ...etc for whatever IDs
+}
+
+enum Core::TextObject {
+        public String content
+}
+
+enum Core::RuleType {
+        WHEN_PROJECT_STARTS = 0
+        ...etc for whatever IDs
+}
+
+enum Core::BlockType {
+        MOVE_FORWARD = 0
+        ...etc for whatever IDs
+}
+
+''' Requests
+
+struct Requests::OnlineProjectMetadata {
+        uint32 likes
+        uint32 mushrooms
+        String thumbnail_url
+}
+
+' Core connections
+Project <-d- Scene
+Scene <-d- Object
+Object <-d- Rule
+Rule <-d- Block
+
+' Relationships
+Project - OnlineProjectMetadata
+Rule -l- RuleType
+Block -l- BlockType
+Object -l- ObjectType
+
+TextObject -r-|> ObjectType
+
+@enduml
