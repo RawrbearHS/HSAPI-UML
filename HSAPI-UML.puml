@@ -1,0 +1,154 @@
+@startuml HSAPI-UML
+
+!include https://raw.githubusercontent.com/patrik-csak/one-dark-plantuml-theme/v1.0.1/theme.puml
+
+skinparam {
+        DefaultFontName Avenir Medium
+}
+
+set separator ::
+
+''' Core
+
+' Structs
+
+struct Core::Project {
+        public SystemTime last_opened
+        public Vec<Scene> scenes
+        ----
+        impl Nameable for Projec
+        fn from_json(serde_json::Value json) -> Self
+        fn to_json() -> String
+}
+
+struct Core::Scene {
+        public Vec<Object> object
+        ----
+        impl Nameable for Scen
+        fn from_json(serde_json::Value json) -> Self
+        fn to_json() -> String
+}
+
+struct Core::Object {
+        public String name
+        public BuiltinObjectID object_type
+        public String text_content
+        public Vec<Rule> rules
+        public addRule(rule) -> (Void, Err)
+        ----
+        impl Nameable for Object
+        fn from_json(serde_json::Value json) -> Self
+        fn to_json() -> String
+}
+
+struct Core::Rule {
+        public BuiltinRuleID rule_type
+        public Block event
+        public Vec<Block> blocks
+        ---
+        fn from_json(serde_json::Value json) -> Self
+        fn to_json() -> String
+}
+
+struct Core::Block {
+        public BlockType block_type
+        public Vec<Parameter> parameters
+        ---
+        fn from_json(serde_json::Value json) -> Self
+        fn to_json() -> String
+}
+
+struct Core::BlockType {
+        u32 id
+        String description
+}
+
+struct Core::Parameter {
+        String key
+        String default_value
+        Value value
+        ---
+        fn from_json(serde_json::Value json) -> Self
+        fn to_json() -> String
+}
+
+' Traits
+
+interface Core::Nameable {
+        String name
+}
+
+interface Core::Hopscotchifiable {
+        fn from_json(serde_json::Value json) -> Self
+        fn to_json() -> void
+}
+
+' Enums
+
+enum Core::BuiltinObjectID {
+        TEXT = 0
+        BEAR = 1
+        ...etc for all object IDs
+}
+
+enum Core::BuiltinRuleID {
+        WHEN_PROJECT_STARTS = 0
+        ...etc for all rule IDs
+}
+
+enum Core::BuiltinBlockID {
+        MOVE_FORWARD = 0
+        ...etc for all block IDs
+}
+
+enum Core::BuiltinValueID {
+        MATH_ADD = 0
+        ...etc for all value IDs
+}
+
+enum Core::Value {
+        Value(String)
+        Block(Block)
+        Variable(Variable)
+        SetImageParameter(ObjectType)
+----
+}
+
+
+''' Requests
+
+struct Requests::OnlineProject {
+        String url
+        String name
+        u32 likes
+        u32 mushrooms
+        String thumbnail_url
+}
+
+' Core connections
+Project <-d- Scene
+Scene <-d- Object
+Object <-d- Rule
+Rule <-d- Block
+Block <-d- Parameter
+Parameter <-d- Value
+
+Nameable <|.r. Project
+Nameable <|.r. Scene
+Nameable <|.r. Object
+
+Hopscotchifiable <|.l. Project
+Hopscotchifiable <|.l. Scene
+Hopscotchifiable <|.l. Object
+Hopscotchifiable <|.l. Rule
+Hopscotchifiable <|.l. Block
+Hopscotchifiable <|.l. Parameter
+
+' Relationships
+Rule .l. BuiltinRuleID
+Block -l- BlockType
+BlockType .l. BuiltinBlockID
+Object .l. BuiltinObjectID
+Value .l. BuiltinValueID
+
+@enduml
